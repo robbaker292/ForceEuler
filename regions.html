@@ -536,6 +536,36 @@
 				edges.push(new Edge(a,k));
 			}
 
+			function circleForceHorizontal(node){
+				//console.log(node);
+				var force = 0;
+				var k = 100000; //multiplier
+
+				//this node's co-ordinates
+				var px = node.x;
+				var py = node.y;
+
+				for(i = 0; i < circles.length; i++){
+					var circle = circles[i];
+					var cx = circle.x;
+					var cy = circle.y;
+					var r = circle.r;
+
+					var v = Math.sqrt(  Math.pow((px - cx),2) +  Math.pow((py - cy),2) );
+
+					var distance = Math.abs(px - (px / (v * r) ));
+
+					console.log(circle,distance,circle.label,node.label);
+					force += k / Math.pow(distance,2);
+					//console.log(circle,"force",force,"cx",cx,"cy",cy,"r",r,"px",px,"py",py,"v",v,"d",distance);
+
+				}
+				console.log(force);
+
+
+			}
+
+
 			function drawGraph(nodes, edges){
 				//console.log(edges);
 
@@ -598,12 +628,16 @@
 						.attr("y1", function(d) { return d.source.y; })
 						.attr("x2", function(d) { return d.target.x; })
 						.attr("y2", function(d) { return d.target.y; });
-					nodes.attr("cx", function(d) { return d.x; })
+					nodes.attr("cx", function(d) {
+							//console.log(d);
+							circleForceHorizontal(d);
+							//force.alpha(0);
+							return d.x; 
+						})
 						.attr("cy", function(d) { return d.y; });
 				});
 					
 			}
-
 
 			function main(){
 				var zones = "a ab ac bc".split(" ");

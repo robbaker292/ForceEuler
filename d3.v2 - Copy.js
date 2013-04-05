@@ -5045,6 +5045,9 @@
     };
     return chord;
   };
+
+
+  
   d3.layout.force = function() {
     function repulse(node) {
       return function(quad, x1, y1, x2, y2) {
@@ -5257,6 +5260,10 @@
     };
     return d3.rebind(force, event, "on");
   };
+
+
+
+
   d3.layout.partition = function() {
     function position(node, x, dx, dy) {
       var children = node.children;
