@@ -675,7 +675,7 @@
 						return "edge" + d.source.label + d.target.label;
 					});
 
-				var m = 0;
+				/*var m = 0;
 				var interval = setInterval(function() {
 							m++;
 							if (m > 20){
@@ -685,7 +685,12 @@
 							iterateGraph(nodes,edges);
 						}
 					,100);
+*/
+			}
 
+			function next(){
+				//console.log(nodes,edges);
+				iterateGraph(nodes,edges);
 			}
 
 			function iterateGraph(nodes, edges){
@@ -714,7 +719,7 @@
 						} 
 					}
 
-					console.log(n1.label, n1.vertical, n1.horizontal);
+					console.log(n1.label, "horizontal rep", n1.horizontal, "vertcial rep", n1.vertical);
 					//insert repulsion from circle edges
 
 				}
@@ -743,7 +748,8 @@
 				for (var i = 0; i < nodes.length; i++){
 					var n = nodes[i];
 
-					console.log(n.label, n.x, n.horizontal, n.y, n.vertical, t);
+					//console.log(n.label, n.x, n.horizontal, n.y, n.vertical, t);
+					var ox, oy;
 
 					d3.select("#node"+n.label)
 						.attr("cx", function(){
@@ -751,18 +757,22 @@
 							//var m = 1;
 							var cx = parseInt(n.x + (m * Math.min(Math.abs(n.horizontal),t)) );
 							//console.log(cx, n, n.x, m, n.horizontal, t);
+							ox = n.x;
 							n.x = cx;
+							
 							return cx;
 						})
 						.attr("cy", function(){
 							var m =	n.vertical > 0 ? 1 : -1;
 							//var m = 1;
 							var cy = parseInt(n.y + (m * Math.min(Math.abs(n.vertical),t)) );
+							oy = n.y;
 							n.y = cy;
+							
 							return cy;
 						})
 
-					console.log(n.label, n.x, n.horizontal, n.y, n.vertical, t);
+					console.log(n.label, "x", ox, n.x, "horizontal", n.horizontal, "y", oy, n.y, "vertcial", n.vertical, "t", t);
 				}
 
 
