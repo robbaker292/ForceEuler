@@ -20,6 +20,9 @@
 			var nodes = [];
 			var edges = [];
 			var multiplier = 3;
+			var c = 20;
+			var t = 200;
+			var k;
 
 			var svg;
 
@@ -51,6 +54,8 @@
 				x = 0;
 				y = 0;
 				this.region = region;
+				horizontal = 0;
+				vertical = 0;
 			}
 
 			function Edge(source, target){
@@ -492,17 +497,17 @@
 			}
 
 			function buildGraph(rectangles){
-				a = new Node("a",rectangles[0]);
-				b = new Node("b",rectangles[0]);
-				c = new Node("c",rectangles[0]);
-				d = new Node("d",rectangles[1]);
-				e = new Node("e",rectangles[1]);
-				f = new Node("f",rectangles[1]);
-				g = new Node("g",rectangles[1]);
-				h = new Node("h",rectangles[2]);
-				i = new Node("i",rectangles[2]);
-				j = new Node("j",rectangles[2]);
-				k = new Node("k",rectangles[3]);
+				var a = new Node("a",rectangles[0]);
+				var b = new Node("b",rectangles[0]);
+				var c = new Node("c",rectangles[0]);
+				var d = new Node("d",rectangles[1]);
+				var e = new Node("e",rectangles[1]);
+				var f = new Node("f",rectangles[1]);
+				var g = new Node("g",rectangles[1]);
+				var h = new Node("h",rectangles[2]);
+				var i = new Node("i",rectangles[2]);
+				var j = new Node("j",rectangles[2]);
+				var k = new Node("k",rectangles[3]);
 
 				nodes.push(a);
 				nodes.push(b);
@@ -551,21 +556,21 @@
 					var cy = circle.y;
 					var r = circle.r;
 
-					//var v = Math.sqrt(  Math.pow((px - cx),2) +  Math.pow((py - cy),2) );
+					var v = Math.sqrt(  Math.pow((px - cx),2) +  Math.pow((py - cy),2) );
 
-					var inside = Math.abs(px - cx) > r;
-
-
-					var distance = inside ? px - (cx + r) : px + (cx - r);
+					var inside = v < (r * multiplier);
 
 
+					//var distance = inside ? px - (cx + r) : px + (cx - r);
 
-					//var distance = Math.abs(px - (px / (v * r) ));
+
+
+					var distance = Math.abs(px - (px / (v * r) ));
 
 					//console.log(circle,distance,circle.label,node.label);
 					var localForce = k / distance;
 					force += localForce;
-					console.log(circle.label,distance, localForce);
+					console.log("node"+node.label,circle.label,distance, localForce, inside, "v", v, "r", r);
 					//console.log(circle,"force",force,"cx",cx,"cy",cy,"r",r,"px",px,"py",py,"v",v,"d",distance);
 
 				}
@@ -574,12 +579,217 @@
 
 			}
 
+			function getAngle(n1, n2){
+				//console.log(n1,n2);
+				var x = n1.x - n2.x;
+				var y = n1.y - n1.y;
+				var angle;
+				//to avoid the ambiguities with the arctan at 0 & 180 deg and the undefined result at 90 & 270
+				if ((x == 0) && (y != 0)) {
+					if (n1.y > n2.y){
+						angle = Math.PI / 2; //90deg
+					} else {
+						angle = ((-1) * Math.PI) / 2; //-90deg
+					}
+				} else if((x != 0) && (y == 0)){
+					if (n1.x > n2.x){
+						angle = Math.PI; //180deg
+					} else {
+						angle = 0; //0deg
+					}
+				} else {
+					angle = Math.atan(y/x);
+				}
+				return angle;
+			}
+
+			function cool(t){
+				return t/2;
+			}
+
+			function forceAttract(x, k){
+				return (x * x)/k;
+			}
+
+			function forceRepel(x, k){
+				//console.log(x, k);
+				return (k * k)/x;
+			}
 
 			function drawGraph(nodes, edges){
 				//console.log(edges);
 
-				
+				k = c * Math.sqrt(800 / nodes.length);
+				console.log(k,c, nodes.length);
 
+				svg.selectAll("circle")
+					.data(nodes, function(d){
+						return d;
+					})
+					.enter()
+					.append("circle")
+					.attr("r",5)
+					.attr("cx",function (d,i){
+						
+						var cx = parseInt(((Math.random() * d.region.width) + d.region.x) * multiplier);
+						d.x = cx;
+						//console.log("x", d);
+						return cx;
+
+						//return d.region.width * multiplier;
+						//return 10;
+					})
+					.attr("cy",function (d,i){
+						//console.log("y", d.region.y * multiplier);
+						//d.y = d.region.y;
+						var cy = parseInt(((Math.random() * d.region.height) + d.region.y) * multiplier);
+						d.y = cy;
+						return cy;
+						//return 10;
+					})
+					.attr("id", function(d){
+						return "node" + d.label;
+					})
+					.attr("class","node")
+					.style("fill", "blue");
+
+				svg.selectAll("line")
+					.data(edges)
+					.enter()
+					.append("line")
+					.attr("x1", function(d){
+						return d3.select("#node"+d.source.label).attr("cx");
+					})
+					.attr("y1", function(d){
+						return d3.select("#node"+d.source.label).attr("cy");
+					})
+					.attr("x2", function(d){
+						return d3.select("#node"+d.target.label).attr("cx");
+					})
+					.attr("y2", function(d){
+						return d3.select("#node"+d.target.label).attr("cy");
+					})
+					.style("stroke", "#000000")
+					.style("stroke-width", 1)
+					.attr("id", function(d){
+						return "edge" + d.source.label + d.target.label;
+					});
+
+				var m = 0;
+				var interval = setInterval(function() {
+							m++;
+							if (m > 20){
+								window.clearInterval(interval);
+							}
+							console.log(m);
+							iterateGraph(nodes,edges);
+						}
+					,100);
+
+			}
+
+			function iterateGraph(nodes, edges){
+
+				//for every node
+				for(var i = 0; i < nodes.length; i++){
+					var n1 = nodes[i];
+
+					n1.vertical = 0;
+					n1.horizontal = 0;
+
+					//calculate repulsion force
+					for (var j = 0; j < nodes.length; j++){
+						var n2 = nodes[j];
+						if (n1 != n2){
+							var x = n1.x - n2.x;
+							var y = n1.y - n2.y;
+							var distance = Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
+
+							var angle = getAngle(n1,n2);
+							//console.log(distance, forceRepel(distance,k));
+							n1.horizontal = n1.horizontal + (forceRepel(distance,k) * Math.cos(angle));
+							n1.vertical = n1.vertical + (forceRepel(distance,k) * Math.sin(angle))
+
+							//console.log(n1, n1.horizontal, n1.vertical);
+						} 
+					}
+
+					console.log(n1.label, n1.vertical, n1.horizontal);
+					//insert repulsion from circle edges
+
+				}
+
+				//calculate attraction force
+				for (var i = 0; i < edges.length; i++){
+					e = edges[i];
+
+					
+					var angle = getAngle(e.source, e.target);
+					var x = e.source.x - e.target.x;
+					var y = e.source.y - e.target.y;
+
+					var distance = Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
+
+					//console.log(e.source.horizontal, e.source.vertical, distance, forceAttract(distance), angle);
+					
+					e.source.horizontal = e.source.horizontal + (forceAttract(distance,k) * Math.cos(angle));
+					e.source.vertical = e.source.vertical + (forceAttract(distance,k) * Math.sin(angle));
+
+					e.target.horizontal = e.target.horizontal - (forceAttract(distance,k) * Math.cos(angle));
+					e.target.vertical = e.target.vertical - (forceAttract(distance,k) * Math.sin(angle));
+				}
+
+				//move nodes around
+				for (var i = 0; i < nodes.length; i++){
+					var n = nodes[i];
+
+					console.log(n.label, n.x, n.horizontal, n.y, n.vertical, t);
+
+					d3.select("#node"+n.label)
+						.attr("cx", function(){
+							var m =	n.horizontal > 0 ? 1 : -1;
+							//var m = 1;
+							var cx = parseInt(n.x + (m * Math.min(Math.abs(n.horizontal),t)) );
+							//console.log(cx, n, n.x, m, n.horizontal, t);
+							n.x = cx;
+							return cx;
+						})
+						.attr("cy", function(){
+							var m =	n.vertical > 0 ? 1 : -1;
+							//var m = 1;
+							var cy = parseInt(n.y + (m * Math.min(Math.abs(n.vertical),t)) );
+							n.y = cy;
+							return cy;
+						})
+
+					console.log(n.label, n.x, n.horizontal, n.y, n.vertical, t);
+				}
+
+
+				//move edges around
+				for (var i = 0; i < edges.length; i++){
+					e = edges[i];
+					d3.select("#edge"+e.source.label+e.target.label)
+						.attr("x1", function(){
+							return d3.select("#node"+e.source.label).attr("cx");
+						})
+						.attr("y1", function(){
+							return d3.select("#node"+e.source.label).attr("cy");
+						})
+						.attr("x2", function(){
+							return d3.select("#node"+e.target.label).attr("cx");
+						})
+						.attr("y2", function(){
+							return d3.select("#node"+e.target.label).attr("cy");
+						});
+				}
+
+				t = cool(t);
+
+			}
+
+				
+			/**
 				var force = d3.layout.force()
 					.nodes(nodes)
 					.links(edges)
@@ -613,24 +823,9 @@
 					.style("fill", "blue")
 					.call(force.drag);
 
-				var edges = svg.selectAll("line")
-					.data(edges)
-					.enter()
-					.append("line")
-					.attr("x1", function(d){
-						return d3.select("#node"+d.source.label).attr("cx");
-					})
-					.attr("y1", function(d){
-						return d3.select("#node"+d.source.label).attr("cy");
-					})
-					.attr("x2", function(d){
-						return d3.select("#node"+d.target.label).attr("cx");
-					})
-					.attr("y2", function(d){
-						return d3.select("#node"+d.target.label).attr("cy");
-					})
-					.style("stroke", "#000000")
-					.style("stroke-width", 1);
+				
+
+				force.linkDistance(20);
 
 				force.on("tick", function(){
 					edges.attr("x1", function(d) { return d.source.x; })
@@ -644,11 +839,10 @@
 							return d.x + circleForceHorizontal(d); 
 						})
 						.attr("cy", function(d) { return d.y; });
-					//force.alpha(0);
+					force.alpha(0);
 				});
+*/
 
-					
-			}
 
 			function main(){
 				var zones = "a ab ac bc".split(" ");
@@ -657,7 +851,6 @@
 				svg = d3.select("body").append("svg")
 				    .attr("width", 800)
 				    .attr("height", 600);
-
 
 				parseFile(input, zones);
 			}
