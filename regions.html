@@ -41,6 +41,7 @@
 				this.y = y;
 				this.width = width;
 				this.height = height;
+				this.label = "";
 			}
 			
 			function Point(x,y) {
@@ -51,8 +52,8 @@
 
 			function Node(label,region){
 				this.label = label;
-				x = 0;
-				y = 0;
+				x = 0.0;
+				y = 0.0;
 				this.region = region;
 				horizontal = 0;
 				vertical = 0;
@@ -387,7 +388,12 @@
 					
 					var circlesOutZone = getOutZones(circles, circlesInZone);
 					var rectangle = findZoneRectangle(circlesInZone,circlesOutZone);
-					
+
+					for (var j = 0; j < circlesInZone.length; j++){
+						rectangle.label = rectangle.label + "" + circlesInZone[j].label;
+					}
+
+					//console.log(circlesInZone, circlesOutZone, rectangle);
 					rectangles.push(rectangle);
 				}
 				return rectangles;
@@ -398,7 +404,7 @@
 				var txtFile = new XMLHttpRequest();
 
 				txtFile.open("GET", "runJava.php?input="+input, true);
-
+//var txtFile = ["label, cx, cy, radius,","c, 68.33333333333333, 72.59103641456582, 63.29113497213361,","b, 131.62446830546693, 72.59103641456582, 63.29113497213361,","a, 99.97890081940014, 127.40276713478325, 63.29113497213361,",""];
 				
 				txtFile.onreadystatechange = function() {
 					if (txtFile.readyState != 4) {
@@ -406,6 +412,7 @@
 					} else {
 						if (txtFile.status === 200) { 		
 							decodeCsv(txtFile.responseText.split("\n"));
+//decodeCsv(txtFile);
 							//console.log(circles,zones);
 							testRegion(zones);
 						}
@@ -465,9 +472,18 @@
 
 					svg.select("g")
 						.append("circle")
-						.attr("r", circle.r * multiplier)
-						.attr("cx",circle.x * multiplier)
-						.attr("cy",circle.y * multiplier)
+						.attr("r", function(){
+							circle.r = circle.r * multiplier;
+							return circle.r
+						})
+						.attr("cx",function(){
+							circle.x = circle.x * multiplier;
+							return circle.x
+						})
+						.attr("cy",function(){
+							circle.y = circle.y * multiplier;
+							return circle.y
+						})
 						.attr("class","euler");
 					//console.log(circle);
 				}
@@ -481,10 +497,10 @@
 
 					svg.select("g")
 						.append("rect")
-						.attr("x", rectangles[i].x * multiplier)
-					    .attr("y", rectangles[i].y * multiplier)
-					    .attr("width", rectangles[i].width * multiplier)
-					    .attr("height", rectangles[i].height * multiplier)
+						.attr("x", rectangles[i].x)
+					    .attr("y", rectangles[i].y)
+					    .attr("width", rectangles[i].width)
+					    .attr("height", rectangles[i].height)
 				}
 
 				//place nodes in random positions
@@ -570,11 +586,11 @@
 					//console.log(circle,distance,circle.label,node.label);
 					var localForce = k / distance;
 					force += localForce;
-					console.log("node"+node.label,circle.label,distance, localForce, inside, "v", v, "r", r);
+					//console.log("node"+node.label,circle.label,distance, localForce, inside, "v", v, "r", r);
 					//console.log(circle,"force",force,"cx",cx,"cy",cy,"r",r,"px",px,"py",py,"v",v,"d",distance);
 
 				}
-				console.log(force);
+				//console.log(force);
 				return force;
 
 			}
@@ -615,12 +631,39 @@
 				//console.log(x, k);
 				return (k * k)/x;
 			}
+			
+			function nodesConnect(n1,n2) {
+				for (var i = 0; i < edges.length; i++){
+					e = edges[i];
+					
+					if(n1 == e.source && n2 == e.target) {
+						return true;
+					}
+					if(n1 == e.target && n2 == e.source) {
+						return true;
+					}
+				}
+				return false;
+			}
+
+			function nodesInRegion(region){
+				var result = [];
+				for (var i = 0; i < nodes.length; i++){
+					if (nodes[i].region == region){
+						result.push(nodes[i]);
+					}
+				}
+				return result;
+			}
+
 
 			function drawGraph(nodes, edges){
 				//console.log(edges);
 
 				k = c * Math.sqrt(800 / nodes.length);
-				console.log(k,c, nodes.length);
+				//console.log(k,c, nodes.length);
+
+				
 
 				svg.selectAll("circle")
 					.data(nodes, function(d){
@@ -631,20 +674,46 @@
 					.attr("r",5)
 					.attr("cx",function (d,i){
 						
-						var cx = parseInt(((Math.random() * d.region.width) + d.region.x) * multiplier);
+						var cols = Math.round(Math.sqrt(nodesInRegion(d.region).length));
+
+						//console.log((i % cols)+1, i, cols, nodes.length, d.region.width, (d.region.width / (cols + 1)));
+						var cx = ( ((i % cols)+1) * (d.region.width / (cols + 1)) ) + d.region.x;
+						 //var cx = (Math.random() * d.region.width) + d.region.x;
 						d.x = cx;
 						//console.log("x", d);
-						return cx;
+						return parseInt(cx);
 
 						//return d.region.width * multiplier;
 						//return 10;
 					})
-					.attr("cy",function (d,i){
+					.attr("cy",function (d){
 						//console.log("y", d.region.y * multiplier);
 						//d.y = d.region.y;
-						var cy = parseInt(((Math.random() * d.region.height) + d.region.y) * multiplier);
+
+						var cols = Math.round(Math.sqrt(nodesInRegion(d.region).length));
+
+						//var cy = d.region.y + ((Math.floor(i / cols)+1) * (d.region.height / (cols + 1)));
+						//console.log(cy, d.region.height, d.region.y, Math.floor(i / cols)+1 , (d.region.height / (cols + 1)));
+
+						var i = nodesInRegion(d.region).indexOf(d);
+
+						/*
+						console.log(
+							d.region.y,
+							"i", i,
+							"cols", cols,
+							i % cols,
+							(Math.floor(i / cols)+1),
+							(d.region.height / (cols + 1)),
+							((Math.floor(i % cols)+1) * (d.region.height / (cols + 1)))
+						);
+*/
+						var cy = ((Math.floor(i / cols)+1) * (d.region.height / (cols + 1))) + d.region.y
+
+						//var cy = (Math.random() * d.region.height) + d.region.y;
+						//var cy = d.region.y + 50;
 						d.y = cy;
-						return cy;
+						return parseInt(cy);
 						//return 10;
 					})
 					.attr("id", function(d){
@@ -675,26 +744,49 @@
 						return "edge" + d.source.label + d.target.label;
 					});
 
-				/*var m = 0;
+				var m = 0;
+/*nodes[0].x = 100;
+nodes[0].y = 200;
+nodes[1].x = 200;
+nodes[1].y = 100;
+
+
+nodes[0].x = 100;
+nodes[0].y = 100;
+nodes[1].x = 300;
+nodes[1].y = 200;
+
+nodes[0].x = 300;
+nodes[0].y = 100;
+nodes[1].x = 100;
+nodes[1].y = 200;
+
+nodes[0].x = 100;
+nodes[0].y = 100;
+nodes[1].x = 200;
+nodes[1].y = 100;
+*/
+
 				var interval = setInterval(function() {
 							m++;
-							if (m > 20){
+							if (m > 50){
 								window.clearInterval(interval);
 							}
 							console.log(m);
 							iterateGraph(nodes,edges);
 						}
 					,100);
-*/
+
 			}
 
 			function next(){
-				//console.log(nodes,edges);
+				//console.log(nodes, edges);
 				iterateGraph(nodes,edges);
-			}
+			} 
+
 
 			function iterateGraph(nodes, edges){
-
+/*
 				//for every node
 				for(var i = 0; i < nodes.length; i++){
 					var n1 = nodes[i];
@@ -715,7 +807,7 @@
 							n1.horizontal = n1.horizontal + (forceRepel(distance,k) * Math.cos(angle));
 							n1.vertical = n1.vertical + (forceRepel(distance,k) * Math.sin(angle))
 
-							//console.log(n1, n1.horizontal, n1.vertical);
+							console.log("repulsion", n1, n1.horizontal, n1.vertical);
 						} 
 					}
 
@@ -744,7 +836,119 @@
 					e.target.vertical = e.target.vertical - (forceAttract(distance,k) * Math.sin(angle));
 				}
 
-				//move nodes around
+*/
+
+				var k = 0.1; // attractive multiplier
+				var r = 5000.0; // repulsive mutiplier
+				var f = 1.0; // force multiplier
+				var maxForce = 10 // force limit in horizontal or vertical
+
+				for(var i = 0; i < nodes.length; i++){
+				
+					var xAttractive = 0;
+					var yAttractive = 0;
+					var xRepulsive = 0;
+					var yRepulsive = 0;
+					for(var j = 0; j < nodes.length; j++){
+						if(i != j) {
+							var n1 = nodes[i];
+							var n2 = nodes[j];
+
+							var distance = Math.sqrt( Math.pow(n1.x - n2.x, 2) + Math.pow(n1.y - n2.y, 2) );
+							var xDistance = n1.x - n2.x;
+							var yDistance = n1.y - n2.y;
+							
+							var absDistance = distance;
+							var absXDistance = xDistance;
+							if(absXDistance < 0) {
+								absXDistance = -xDistance;
+							}
+							var absYDistance = yDistance;
+							if(absYDistance < 0) {
+								absYDistance = -yDistance;
+							}
+
+							var xForceShare = absXDistance/(absXDistance+absYDistance);
+							var yForceShare = absYDistance/(absXDistance+absYDistance);
+
+							if (nodesConnect(n1,n2)) {
+
+								if(xDistance > 0) {
+									xAttractive -= k*xForceShare*absDistance;
+								} else {
+									if(xDistance < 0) {
+										xAttractive += k*xForceShare*absDistance;
+									}
+								}
+
+								if(yDistance > 0) {
+									yAttractive -= k*yForceShare*absDistance;
+								} else {
+									if(yDistance < 0) {
+										yAttractive += k*yForceShare*absDistance;
+									}
+								}
+							}
+
+
+							var repulsiveForce = r / (distance * distance);
+
+							if(xDistance > 0) {
+								xRepulsive += repulsiveForce*xForceShare;
+							} else {
+								if(xDistance < 0) {
+									xRepulsive -= repulsiveForce*xForceShare;
+								}
+							}
+
+							if(yDistance > 0) {
+								yRepulsive += repulsiveForce*yForceShare;
+							} else {
+								if(yDistance < 0) {
+									yRepulsive -= repulsiveForce*yForceShare;
+								}
+							}
+
+							
+						}
+					}
+//console.log(n1.label,"x rep att",xRepulsive,xAttractive);
+//console.log(n1.label,"y rep att",yRepulsive,yAttractive);
+					
+					var totalXForce = f*(xRepulsive + xAttractive);
+					var totalYForce = f*(yRepulsive + yAttractive);
+//totalYForce = 0;
+//console.log("A totalYForce",totalYForce);
+
+					if(totalXForce > 0) {
+						if(totalXForce > maxForce) {
+							totalXForce = maxForce;
+						}
+					} else {
+						if(-totalXForce > maxForce) {
+							totalXForce = -maxForce;
+						}
+					}
+					if(totalYForce > 0) {
+						if(totalYForce > maxForce) {
+							totalYForce = maxForce;
+						}
+					} else {
+						if(-totalYForce > maxForce) {
+							totalYForce = -maxForce;
+						}
+					}
+//console.log("B totalYForce",totalYForce);
+
+					n1.horizontal = totalXForce;
+					n1.vertical = totalYForce;
+//console.log("n1.horizontal",n1.horizontal);
+					
+
+					
+				}
+
+								//move nodes around
 				for (var i = 0; i < nodes.length; i++){
 					var n = nodes[i];
 
@@ -753,29 +957,32 @@
 
 					d3.select("#node"+n.label)
 						.attr("cx", function(){
-							var m =	n.horizontal > 0 ? 1 : -1;
-							//var m = 1;
-							var cx = parseInt(n.x + (m * Math.min(Math.abs(n.horizontal),t)) );
-							//console.log(cx, n, n.x, m, n.horizontal, t);
-							ox = n.x;
-							n.x = cx;
 							
-							return cx;
+							//if node has moved to a different circle
+							if (insideCircles(n).length == 0){
+								n.x = n.x + n.horizontal;
+							}
+
+							ox = parseInt(n.x);
+						
+							return ox;
 						})
 						.attr("cy", function(){
-							var m =	n.vertical > 0 ? 1 : -1;
-							//var m = 1;
-							var cy = parseInt(n.y + (m * Math.min(Math.abs(n.vertical),t)) );
-							oy = n.y;
-							n.y = cy;
+
+							//if node has moved to a different circle
+							if (insideCircles(n).length == 0){
+								n.y = n.y + n.vertical;
+							}							
 							
-							return cy;
+							oy = parseInt(n.y);
+							
+							return oy;
 						})
 
-					console.log(n.label, "x", ox, n.x, "horizontal", n.horizontal, "y", oy, n.y, "vertcial", n.vertical, "t", t);
+//					console.log(n.label, "x", ox, n.x, "horizontal", n.horizontal, "y", oy, n.y, "vertical", n.vertical, "t", t);
 				}
 
-
+				
 				//move edges around
 				for (var i = 0; i < edges.length; i++){
 					e = edges[i];
@@ -865,6 +1072,59 @@
 				parseFile(input, zones);
 			}
 			
+			/*
+			Finds a circle given a label
+			 */
+			function findCircle(label){
+				for (var i = 0; i < circles.length; i++){
+					if (label == circles[i].label){
+						return circles[i];
+					}
+				}
+			}
+
+			/*
+				Returns an array of circles this node is outside of that it shouldn't be
+			 */
+			function insideCircles(node){
+				var strCircles = node.region.label;
+				var result = [];
+				//console.log(circles);
+
+				for (var i = 0; i < circles.length; i++){
+					var circle = circles[i];
+					var distance = Math.sqrt( Math.pow(node.x - circle.x, 2) + Math.pow(node.y - circle.y, 2) );
+					//does this node's region contain this circle
+					if (strCircles.indexOf(circle.label) != -1) {
+						//check node is inside
+						
+						//console.log(strCircles, label, circle, node, distance);
+						if (distance >= circle.r){
+							result.push(circle);
+						}
+					} else {
+						//check if node is outside
+						if (distance <= circle.r){
+							result.push(circle);
+						}
+
+					}
+				}
+
+/*
+				for (var i  = 0; i < strCircles.length; i++){
+					var label = strCircles[i];
+					var circle = findCircle(label);
+
+					var distance = Math.sqrt( Math.pow(node.x - circle.x, 2) + Math.pow(node.y - circle.y, 2) );
+
+					//console.log(strCircles, label, circle, node, distance);
+					if (distance > circle.r){
+						result.push(circle);
+					}
+				}
+*/				return result;
+			}
 						
 	</script>
 	</head>
