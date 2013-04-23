@@ -10,13 +10,7 @@
 			}
 
 			rect {
-				fill: rgba(0, 255, 0, 0.5); 
-			}
-
-			text {
-				font-weight: bold;
-				font-size: 1.5em;
-				font-family: sans-serif;
+				fill: rgba(0, 255, 0, 0.5);
 			}
 		</style>
 		<script type="text/javascript" src="d3.v2.js"></script>
@@ -31,7 +25,7 @@
 			var k;
 
 			var svg;
-			var times = [];
+
 		
 			/** A labelled circle */
 			function Circle(label,r,x,y) {
@@ -70,19 +64,6 @@
 				this.target = target;
 			}
 
-
-			function Time(time){
-				this.time = time;
-				this.interactions = [];
-			}
-
-			function Interaction(start, end, size){
-				this.start = start;
-				this.end = end;
-				this.size = size;
-			}
-
-			
 
 			/** Find the circle with the given label */
 			function circleWithLabel(label, circles) {
@@ -420,62 +401,7 @@
 
 
 			function parseFile(input, zones){
-
 				var txtFile = new XMLHttpRequest();
-
-				txtFile.open("GET", "inter_node_data/data/inter_node_sum.txt", true);
-
-				txtFile.onreadystatechange = function() {
-					if (txtFile.readyState != 4) {
-						window.status="Loading";
-					} else {
-						if (txtFile.status === 200) {
-
-							var input = txtFile.responseText.split(".");
-								
-							console.log(input[0], times);	
-							//for (var i = 0; i < input.length; i++){
-							for (var i = 0; i < 5; i++){
-								var timeInstance = input[i];
-
-								var interactions = timeInstance.split(",\n");
-								
-								var timeInt = "";
-								if (i == 0) {
-									timeInt = parseInt(interactions[0].substring(1));
-								} else {
-									timeInt = parseInt(interactions[0].substring(2));
-								}
-
-								var time = new Time(timeInt);
-								times.push(time);
-
-								for (var j = 1; j < interactions.length; j++){
-									var interactionDetails = interactions[j].split(",");
-
-									var start = parseInt(interactionDetails[0].substring(8));
-									var finish = parseInt(interactionDetails[1].substring(4));
-									var count = parseInt(interactionDetails[2]);
-
-									//console.log(time);
-
-									time.interactions.push( new Interaction (start, finish, count));
-
-									//console.log(start, finish, count);
-								}
-
-							}
-
-							console.log(times);
-
-						}
-					}
-				};
-				txtFile.send(null);
-
-				console.log(times);
-
-				txtFile = new XMLHttpRequest();
 
 				txtFile.open("GET", "runJava.php?input="+input, true);
 //var txtFile = ["label, cx, cy, radius,","c, 68.33333333333333, 72.59103641456582, 63.29113497213361,","b, 131.62446830546693, 72.59103641456582, 63.29113497213361,","a, 99.97890081940014, 127.40276713478325, 63.29113497213361,",""];
@@ -509,11 +435,40 @@
 			
 						
 			function testRegion(zones) {
+				//var canvas = document.getElementById('example');
+				//var context = canvas.getContext('2d');
 
+//				var circle1 = new Circle("a",40,80,80);
+//				var circles = [circle1];
+
+				//var circle1 = new Circle("a",40,80,80);
+				//var circle2 = new Circle("b",40,110,110);
+				//var circle3 = new Circle("c",40,140,95);
+				//var circles = [circle1,circle2,circle3];
+				
+
+				//parseFile(input);
+
+				//console.log(circles, zones);
+/*
+				var circle1 = new Circle("a",40,80,80);
+				var circle2 = new Circle("b",45,110,110);
+				var circle3 = new Circle("c",50,170,130);
+				var circle4 = new Circle("d",30,300,50);
+				var circles = [circle1,circle2,circle3,circle4];
+				
+//				var zones = ['a', 'ab', 'd'];
+				var zones = ['b'];
+*/
 				svg.append("g");
+
 				for (var i = 0; i < circles.length; i++) {
 					circle = circles[i];
-
+					//context.beginPath();
+					//context.arc(circle.x * multiplier, circle.y * multiplier, circle.r  * multiplier, 0, Math.PI*2, false); 
+					//context.lineWidth = 1;
+					//context.strokeStyle = 'blue';
+					//context.stroke();
 
 					svg.select("g")
 						.append("circle")
@@ -529,22 +484,7 @@
 							circle.y = circle.y * multiplier;
 							return circle.y
 						})
-						.attr("class","euler")
-
-					svg.select("g")
-						.append("text")
-						.text(function(){
-							return circle.label;
-						})
-						.attr("x", function(){
-							return circle.x;
-						})
-						.attr("y", function(){
-							return (circle.y - circle.r)-5 ;
-						})
-						.attr("width", 20)
-						.attr("height", 20);
-					
+						.attr("class","euler");
 					//console.log(circle);
 				}
 								
@@ -597,8 +537,6 @@
 				nodes.push(j);
 				nodes.push(k);
 
-				console.log(times[0]);
-
 				edges.push(new Edge(a,b));
 				edges.push(new Edge(b,c));
 				edges.push(new Edge(a,c));
@@ -617,7 +555,6 @@
 				edges.push(new Edge(j,k));
 				edges.push(new Edge(i,d));
 				edges.push(new Edge(a,k));
-
 			}
 
 			function circleForceHorizontal(node){
@@ -808,25 +745,11 @@
 					});
 
 				var m = 0;
-//nodes[0].x = 340;
-//nodes[0].y = 500;
-
-//nodes[0].x = 230;
-//nodes[0].y = 395;
-
-//nodes[0].x = 380;
-//nodes[0].y = 200;
-
-//nodes[0].x = 420;
-//nodes[0].y = 400;
-
-//nodes[0].x = 220;
-//nodes[0].y = 420;
-
-
-/*
+/*nodes[0].x = 100;
+nodes[0].y = 200;
 nodes[1].x = 200;
 nodes[1].y = 100;
+
 
 nodes[0].x = 100;
 nodes[0].y = 100;
@@ -846,13 +769,13 @@ nodes[1].y = 100;
 
 				var interval = setInterval(function() {
 							m++;
-							if (m > 500){
+							if (m > 50){
 								window.clearInterval(interval);
 							}
-							//console.log(m);
+							console.log(m);
 							iterateGraph(nodes,edges);
 						}
-					,10);
+					,100);
 
 			}
 
@@ -863,25 +786,72 @@ nodes[1].y = 100;
 
 
 			function iterateGraph(nodes, edges){
+/*
+				//for every node
+				for(var i = 0; i < nodes.length; i++){
+					var n1 = nodes[i];
 
-				var K = 0.01; // attractive force multiplier
-				var R = 500.0; // repulsive force mutiplier
-				var C = 500.0; // circle force multiplier
-				var F = 1.0; // final movement multiplier
+					n1.vertical = 0;
+					n1.horizontal = 0;
+
+					//calculate repulsion force
+					for (var j = 0; j < nodes.length; j++){
+						var n2 = nodes[j];
+						if (n1 != n2){
+							var x = n1.x - n2.x;
+							var y = n1.y - n2.y;
+							var distance = Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
+
+							var angle = getAngle(n1,n2);
+							//console.log(distance, forceRepel(distance,k));
+							n1.horizontal = n1.horizontal + (forceRepel(distance,k) * Math.cos(angle));
+							n1.vertical = n1.vertical + (forceRepel(distance,k) * Math.sin(angle))
+
+							console.log("repulsion", n1, n1.horizontal, n1.vertical);
+						} 
+					}
+
+					console.log(n1.label, "horizontal rep", n1.horizontal, "vertcial rep", n1.vertical);
+					//insert repulsion from circle edges
+
+				}
+
+				//calculate attraction force
+				for (var i = 0; i < edges.length; i++){
+					e = edges[i];
+
+					
+					var angle = getAngle(e.source, e.target);
+					var x = e.source.x - e.target.x;
+					var y = e.source.y - e.target.y;
+
+					var distance = Math.sqrt(Math.pow(x,2) + Math.pow(y,2));
+
+					//console.log(e.source.horizontal, e.source.vertical, distance, forceAttract(distance), angle);
+					
+					e.source.horizontal = e.source.horizontal + (forceAttract(distance,k) * Math.cos(angle));
+					e.source.vertical = e.source.vertical + (forceAttract(distance,k) * Math.sin(angle));
+
+					e.target.horizontal = e.target.horizontal - (forceAttract(distance,k) * Math.cos(angle));
+					e.target.vertical = e.target.vertical - (forceAttract(distance,k) * Math.sin(angle));
+				}
+
+*/
+
+				var k = 0.1; // attractive multiplier
+				var r = 5000.0; // repulsive mutiplier
+				var f = 1.0; // force multiplier
 				var maxForce = 10 // force limit in horizontal or vertical
 
 				for(var i = 0; i < nodes.length; i++){
-					var n1 = nodes[i];
 				
 					var xAttractive = 0;
 					var yAttractive = 0;
 					var xRepulsive = 0;
 					var yRepulsive = 0;
-					var xCircleForce = 0;
-					var yCircleForce = 0;
-
 					for(var j = 0; j < nodes.length; j++){
 						if(i != j) {
+							var n1 = nodes[i];
 							var n2 = nodes[j];
 
 							var distance = Math.sqrt( Math.pow(n1.x - n2.x, 2) + Math.pow(n1.y - n2.y, 2) );
@@ -901,127 +871,55 @@ nodes[1].y = 100;
 							var xForceShare = absXDistance/(absXDistance+absYDistance);
 							var yForceShare = absYDistance/(absXDistance+absYDistance);
 
-							// attractive force
 							if (nodesConnect(n1,n2)) {
 
 								if(xDistance > 0) {
-									xAttractive -= K*xForceShare*absDistance;
+									xAttractive -= k*xForceShare*absDistance;
 								} else {
-									xAttractive += K*xForceShare*absDistance;
+									if(xDistance < 0) {
+										xAttractive += k*xForceShare*absDistance;
+									}
 								}
 
 								if(yDistance > 0) {
-									yAttractive -= K*yForceShare*absDistance;
+									yAttractive -= k*yForceShare*absDistance;
 								} else {
-									yAttractive += K*yForceShare*absDistance;
+									if(yDistance < 0) {
+										yAttractive += k*yForceShare*absDistance;
+									}
 								}
 							}
 
 
-							// repulsive force
-							var repulsiveForce = R / (distance * distance);
+							var repulsiveForce = r / (distance * distance);
 
 							if(xDistance > 0) {
 								xRepulsive += repulsiveForce*xForceShare;
 							} else {
-								xRepulsive -= repulsiveForce*xForceShare;
+								if(xDistance < 0) {
+									xRepulsive -= repulsiveForce*xForceShare;
+								}
 							}
 
 							if(yDistance > 0) {
 								yRepulsive += repulsiveForce*yForceShare;
 							} else {
-								yRepulsive -= repulsiveForce*yForceShare;
-							}
-						}
-						
-						// circle - node force
-						for (var k = 0; k < circles.length; k++){
-//var k = 0;
-							var circle = circles[k];
-							var distanceToCentre = Math.sqrt( Math.pow(n1.x - circle.x, 2) + Math.pow(n1.y - circle.y, 2) );
-							
-							var xDistance = n1.x - circle.x;
-							var yDistance = n1.y - circle.y;
-							
-							var absXDistance = xDistance;
-							if(absXDistance < 0) {
-								absXDistance = -xDistance;
-							}
-							var absYDistance = yDistance;
-							if(absYDistance < 0) {
-								absYDistance = -yDistance;
-							}
-							
-							var distanceToCircleBorder = distanceToCentre;
-							if(distanceToCircleBorder < circle.r) {
-								distanceToCircleBorder = circle.r - distanceToCircleBorder;
-							} else {
-								distanceToCircleBorder = distanceToCircleBorder - circle.r;
+								if(yDistance < 0) {
+									yRepulsive -= repulsiveForce*yForceShare;
+								}
 							}
 
-
-
-							var xForceShare = absXDistance/(absXDistance+absYDistance);
-							var yForceShare = absYDistance/(absXDistance+absYDistance);
-
-
-							var circleForce = C / (distanceToCircleBorder * distanceToCircleBorder);
-
-							var	thisAbsXCircleForce = circleForce*xForceShare;
-							if(thisAbsXCircleForce < 0) {
-								thisAbsXCircleForce = -thisAbsXCircleForce;
-							}
 							
-							var	thisAbsYCircleForce = circleForce*yForceShare;
-							if(thisAbsYCircleForce < 0) {
-								thisAbsYCircleForce = -thisAbsYCircleForce;
-							}
-							
-							// sort out movement direction
-							var inside = true;
-							if(distanceToCentre > circle.r) {
-								inside = false;
-							}
-							var above = true;
-							if(n1.y > circle.y) {
-								above = false;
-							}
-							var left = true;
-							if(n1.x > circle.x) {
-								left = false;
-							}
-							
-					
-							var thisXCircleForce = 0;
-							var thisYCircleForce = 0;
-							
-							// assume inside in these tests
-							if(left) {
-								thisXCircleForce = thisAbsXCircleForce
-							} else {
-								thisXCircleForce = -thisAbsXCircleForce
-							}
-							if(above) {
-								thisYCircleForce = thisAbsYCircleForce
-							} else {
-								thisYCircleForce = -thisAbsYCircleForce
-							}
-							// reverse the direction if outside
-							if(!inside) {
-								thisXCircleForce = -thisXCircleForce;
-								thisYCircleForce = -thisYCircleForce;
-							}							
-							
-							xCircleForce += thisXCircleForce;
-							yCircleForce += thisYCircleForce;
-
 						}
 					}
+//console.log(n1.label,"x rep att",xRepulsive,xAttractive);
+//console.log(n1.label,"y rep att",yRepulsive,yAttractive);
 					
-					var totalXForce = F*(xRepulsive + xAttractive + xCircleForce);
-					var totalYForce = F*(yRepulsive + yAttractive + yCircleForce);
+					var totalXForce = f*(xRepulsive + xAttractive);
+					var totalYForce = f*(yRepulsive + yAttractive);
+//totalYForce = 0;
+//console.log("A totalYForce",totalYForce);
 
-					// chop the force if it is too large
 					if(totalXForce > 0) {
 						if(totalXForce > maxForce) {
 							totalXForce = maxForce;
@@ -1040,9 +938,13 @@ nodes[1].y = 100;
 							totalYForce = -maxForce;
 						}
 					}
+//console.log("B totalYForce",totalYForce);
 
 					n1.horizontal = totalXForce;
 					n1.vertical = totalYForce;
+//console.log("n1.horizontal",n1.horizontal);
+					
+
 					
 				}
 
@@ -1057,9 +959,9 @@ nodes[1].y = 100;
 						.attr("cx", function(){
 							
 							//if node has moved to a different circle
-//							if (insideCircles(n).length == 0){
+							if (insideCircles(n).length == 0){
 								n.x = n.x + n.horizontal;
-//							}
+							}
 
 							ox = parseInt(n.x);
 						
@@ -1077,6 +979,7 @@ nodes[1].y = 100;
 							return oy;
 						})
 
+//					console.log(n.label, "x", ox, n.x, "horizontal", n.horizontal, "y", oy, n.y, "vertical", n.vertical, "t", t);
 				}
 
 				
@@ -1097,6 +1000,8 @@ nodes[1].y = 100;
 							return d3.select("#node"+e.target.label).attr("cy");
 						});
 				}
+
+				t = cool(t);
 
 			}
 
@@ -1162,9 +1067,7 @@ nodes[1].y = 100;
 
 				svg = d3.select("body").append("svg")
 				    .attr("width", 800)
-				    .attr("height", 600)
-				    .attr("version", 1.1)
-				    .attr("xmlns", "http://www.w3.org/2000/svg");
+				    .attr("height", 600);
 
 				parseFile(input, zones);
 			}

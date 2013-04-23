@@ -2,10 +2,17 @@
 <head>
 	<script>
 		function Time(time){
-			var time;
 			this.time = time;
+			this.interactions = [];
 		}
 
+		function Interaction(start, end, size){
+			this.start = start;
+			this.end = end;
+			this.size = size;
+		}
+
+		var times = [];
 
 		function parseFile(){
 			var txtFile = new XMLHttpRequest();
@@ -36,6 +43,7 @@
 							}
 
 							var time = new Time(timeInt);
+							times.push(time);
 
 							for (var j = 1; j < interactions.length; j++){
 								var interactionDetails = interactions[j].split(",");
@@ -44,14 +52,16 @@
 								var finish = parseInt(interactionDetails[1].substring(4));
 								var count = parseInt(interactionDetails[2]);
 
-								console.log(start, finish, count);
-							}
+								//console.log(time);
 
-							//console.log(interactions);
+								time.interactions.push( new Interaction (start, finish, count));
+
+								//console.log(start, finish, count);
+							}
 
 						}
 
-						
+						console.log(times);
 
 					}
 				}
