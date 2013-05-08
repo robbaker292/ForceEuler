@@ -18,7 +18,6 @@
 			var txtFile = new XMLHttpRequest();
 
 			txtFile.open("GET", "inter_node_data/data/inter_node_sum.txt", true);
-		//var txtFile = ["label, cx, cy, radius,","c, 68.33333333333333, 72.59103641456582, 63.29113497213361,","b, 131.62446830546693, 72.59103641456582, 63.29113497213361,","a, 99.97890081940014, 127.40276713478325, 63.29113497213361,",""];
 
 			txtFile.onreadystatechange = function() {
 				if (txtFile.readyState != 4) {

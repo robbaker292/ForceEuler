@@ -4,20 +4,7 @@
 		<meta charset="utf-8"/>
 		<title>HTML 5 Canvas example</title>
 		<style type="text/css">
-			.euler {
-				fill: none;
-				stroke: blue;
-			}
 
-			rect {
-				fill: rgba(0, 255, 0, 0.5); 
-			}
-
-			text {
-				font-weight: bold;
-				font-size: 1.5em;
-				font-family: sans-serif;
-			}
 		</style>
 		<script type="text/javascript" src="d3.v2.js"></script>
 		<script>
@@ -29,6 +16,7 @@
 			var c = 20;
 			var t = 200;
 			var k;
+			var rects;
 
 			var svg;
 			var times = [];
@@ -531,6 +519,10 @@
 							return circle.y
 						})
 						.attr("class","euler")
+						.attr("fill", "none")
+						.attr("stroke", "blue");
+
+
 
 					svg.select("g")
 						.append("text")
@@ -544,7 +536,10 @@
 							return (circle.y - circle.r)+25 ;
 						})
 						.attr("width", 20)
-						.attr("height", 20);
+						.attr("height", 20)
+						.attr("font-weight", "bold")
+						.attr("font-size", "1.5em")
+						.attr("font-family", "sans-serif");
 					
 					//console.log(circle);
 				}
@@ -562,8 +557,10 @@
 					    .attr("y", rectangles[i].y)
 					    .attr("width", rectangles[i].width)
 					    .attr("height", rectangles[i].height)
+					    .attr("fill", "rgba(0, 255, 0, 0.5)");
 				}
 
+				rects = rectangles;
 				//place nodes in random positions
 				buildGraph(rectangles);
 
@@ -575,8 +572,8 @@
 
 			function buildGraph(rectangles){
 
-				/* ############# ORIGINAL DATA SET #############
-				var a = new Node("a",rectangles[0]);
+				//############# ORIGINAL DATA SET ############# 
+		/*		var a = new Node("a",rectangles[0]);
 				var b = new Node("b",rectangles[0]);
 				var c = new Node("c",rectangles[0]);
 				var d = new Node("d",rectangles[1]);
@@ -600,28 +597,28 @@
 				nodes.push(j);
 				nodes.push(k);
 
-				console.log(times[0]);
+				//console.log(times[0]);
 
-				edges.push(new Edge(a,b));
-				edges.push(new Edge(b,c));
-				edges.push(new Edge(a,c));
-				edges.push(new Edge(a,d));
-				edges.push(new Edge(d,b));
-				edges.push(new Edge(d,e));
-				edges.push(new Edge(d,f));
-				edges.push(new Edge(e,f));
-				edges.push(new Edge(g,d));
-				edges.push(new Edge(g,e));
-				edges.push(new Edge(g,f));
-				edges.push(new Edge(h,i));
-				edges.push(new Edge(a,h));
-				edges.push(new Edge(i,j));
-				edges.push(new Edge(k,e));
-				edges.push(new Edge(j,k));
-				edges.push(new Edge(i,d));
-				edges.push(new Edge(a,k));
-
-				*/
+				edges.push(new Edge(a,b,25));
+				edges.push(new Edge(b,c,25));
+				edges.push(new Edge(a,c,25));
+				edges.push(new Edge(a,d,25));
+				edges.push(new Edge(d,b,25));
+				edges.push(new Edge(d,e,25));
+				edges.push(new Edge(d,f,25));
+				edges.push(new Edge(e,f,25));
+				edges.push(new Edge(g,d,25));
+				edges.push(new Edge(g,e,25));
+				edges.push(new Edge(g,f,25));
+				edges.push(new Edge(h,i,25));
+				edges.push(new Edge(a,h,25));
+				edges.push(new Edge(i,j,25));
+				edges.push(new Edge(k,e,25));
+				edges.push(new Edge(j,k,25));
+				edges.push(new Edge(i,d,25));
+				edges.push(new Edge(a,k,25));
+*/
+				
 
 				var a = new Node("a",rectangles[1]);
 				var b = new Node("b",rectangles[0]);
@@ -678,6 +675,108 @@
 				edges.push(new Edge(g,j,1));
 
 				edges.push(new Edge(j,k,1));
+
+			}
+
+			function rebuildGraph(){
+
+				edges = [];
+
+				edges.push(new Edge(nodes[10],nodes[1],1));
+				edges.push(new Edge(nodes[11],nodes[1],8));
+				edges.push(new Edge(nodes[9],nodes[9],2));
+				edges.push(new Edge(nodes[9],nodes[10],2));
+				edges.push(new Edge(nodes[10],nodes[3],3));
+				edges.push(new Edge(nodes[11],nodes[3],2));
+				edges.push(new Edge(nodes[9],nodes[3],4));
+				edges.push(new Edge(nodes[1],nodes[3],1));
+				edges.push(new Edge(nodes[2],nodes[3],8));
+				edges.push(new Edge(nodes[4],nodes[4],2));
+				edges.push(new Edge(nodes[11],nodes[2],4));
+				edges.push(new Edge(nodes[9],nodes[11],4));
+				edges.push(new Edge(nodes[3],nodes[3],3));
+				edges.push(new Edge(nodes[1],nodes[2],7));
+				edges.push(new Edge(nodes[9],nodes[1],10));
+				edges.push(new Edge(nodes[10],nodes[2],4));
+				edges.push(new Edge(nodes[2],nodes[2],8));
+				edges.push(new Edge(nodes[0],nodes[9],4));
+				edges.push(new Edge(nodes[0],nodes[2],8));
+				edges.push(new Edge(nodes[0],nodes[11],3));
+				edges.push(new Edge(nodes[10],nodes[11],2));
+				edges.push(new Edge(nodes[11],nodes[11],1));
+				edges.push(new Edge(nodes[10],nodes[8],1));
+				edges.push(new Edge(nodes[0],nodes[8],7));
+				edges.push(new Edge(nodes[3],nodes[8],5));
+				edges.push(new Edge(nodes[11],nodes[8],2));
+				edges.push(new Edge(nodes[9],nodes[6],5));
+				edges.push(new Edge(nodes[9],nodes[5],7));
+				edges.push(new Edge(nodes[3],nodes[5],5));
+				edges.push(new Edge(nodes[5],nodes[6],10));
+				edges.push(new Edge(nodes[10],nodes[5],5));
+				edges.push(new Edge(nodes[9],nodes[4],2));
+				edges.push(new Edge(nodes[8],nodes[8],5));
+				edges.push(new Edge(nodes[1],nodes[5],3));
+				edges.push(new Edge(nodes[5],nodes[5],3));
+				edges.push(new Edge(nodes[10],nodes[4],1));
+				edges.push(new Edge(nodes[3],nodes[4],6));
+				edges.push(new Edge(nodes[4],nodes[5],6));
+				edges.push(new Edge(nodes[2],nodes[4],4));
+				edges.push(new Edge(nodes[0],nodes[10],2));
+				edges.push(new Edge(nodes[2],nodes[8],8));
+				edges.push(new Edge(nodes[9],nodes[8],4));
+				edges.push(new Edge(nodes[1],nodes[6],10));
+				edges.push(new Edge(nodes[2],nodes[5],7));
+				edges.push(new Edge(nodes[7],nodes[7],3));
+				edges.push(new Edge(nodes[0],nodes[4],6));
+				edges.push(new Edge(nodes[0],nodes[5],5));
+				edges.push(new Edge(nodes[0],nodes[0],3));
+				edges.push(new Edge(nodes[0],nodes[7],5));
+				edges.push(new Edge(nodes[0],nodes[3],7));
+				edges.push(new Edge(nodes[3],nodes[6],4));
+				edges.push(new Edge(nodes[11],nodes[6],5));
+				edges.push(new Edge(nodes[10],nodes[6],1));
+				edges.push(new Edge(nodes[6],nodes[6],1));
+				edges.push(new Edge(nodes[4],nodes[6],7));
+				edges.push(new Edge(nodes[5],nodes[8],5));
+				edges.push(new Edge(nodes[6],nodes[8],9));
+				edges.push(new Edge(nodes[1],nodes[8],1));
+				edges.push(new Edge(nodes[0],nodes[6],1));
+				edges.push(new Edge(nodes[1],nodes[4],9));
+				edges.push(new Edge(nodes[1],nodes[1],9));
+				edges.push(new Edge(nodes[0],nodes[1],2));
+				edges.push(new Edge(nodes[11],nodes[4],1));
+				edges.push(new Edge(nodes[4],nodes[8],2));
+				edges.push(new Edge(nodes[2],nodes[6],3));
+				edges.push(new Edge(nodes[9],nodes[2],5));
+
+				d3.selectAll("line").remove();
+
+				svg.selectAll("line")
+					.data(edges)
+					.enter()
+					.append("line")
+					.attr("x1", function(d){
+						console.log(d);
+						return d3.select("#node"+d.source.label).attr("cx");
+					})
+					.attr("y1", function(d){
+						return d3.select("#node"+d.source.label).attr("cy");
+					})
+					.attr("x2", function(d){
+						return d3.select("#node"+d.target.label).attr("cx");
+					})
+					.attr("y2", function(d){
+						return d3.select("#node"+d.target.label).attr("cy");
+					})
+					.style("stroke", function (d){
+						console.log(d.size);
+						var size = Math.max(200-(d.size * 10),0);
+						return "rgb(" + size + "," + size + "," + size + ")";
+					})
+					.style("stroke-width", 2)
+					.attr("id", function(d){
+						return "edge" + d.source.label + d.target.label;
+					});
 
 			}
 
@@ -852,6 +951,7 @@
 					.enter()
 					.append("line")
 					.attr("x1", function(d){
+						console.log(d);
 						return d3.select("#node"+d.source.label).attr("cx");
 					})
 					.attr("y1", function(d){
@@ -864,7 +964,7 @@
 						return d3.select("#node"+d.target.label).attr("cy");
 					})
 					.style("stroke", function (d){
-						console.log(d.size);
+						//console.log(d.size);
 						var size = Math.max(200-(d.size * 10),0);
 						return "rgb(" + size + "," + size + "," + size + ")";
 					})
@@ -909,8 +1009,8 @@ nodes[0].y = 100;
 nodes[1].x = 200;
 nodes[1].y = 100;
 */
-/*
-				var interval = setInterval(function() {
+
+/*				var interval = setInterval(function() {
 							m++;
 							if (m > 500){
 								window.clearInterval(interval);
@@ -1230,10 +1330,10 @@ nodes[1].y = 100;
 
 			function main(){
 
-				/* #### ORIGINAL DATASET
-				var zones = "a ab ac bc".split(" ");
-				var input = "a b c ab ac bc abc";
-				*/
+				 // #### ORIGINAL DATASET
+				//var zones = "a ab ac bc".split(" ");
+				//var input = "a b c ab ac bc abc";
+				
 			
 				var zones = "a ab bc bd d".split(" ");
 				var input = "a b c ab ac bc abc d da db dab";
