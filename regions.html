@@ -65,9 +65,10 @@
 				vertical = 0;
 			}
 
-			function Edge(source, target){
+			function Edge(source, target, size){
 				this.source = source;
 				this.target = target;
+				this.size = size;
 			}
 
 
@@ -540,7 +541,7 @@
 							return circle.x;
 						})
 						.attr("y", function(){
-							return (circle.y - circle.r)-5 ;
+							return (circle.y - circle.r)+25 ;
 						})
 						.attr("width", 20)
 						.attr("height", 20);
@@ -573,6 +574,8 @@
 			}
 
 			function buildGraph(rectangles){
+
+				/* ############# ORIGINAL DATA SET #############
 				var a = new Node("a",rectangles[0]);
 				var b = new Node("b",rectangles[0]);
 				var c = new Node("c",rectangles[0]);
@@ -617,6 +620,64 @@
 				edges.push(new Edge(j,k));
 				edges.push(new Edge(i,d));
 				edges.push(new Edge(a,k));
+
+				*/
+
+				var a = new Node("a",rectangles[1]);
+				var b = new Node("b",rectangles[0]);
+				var c = new Node("c",rectangles[0]);
+				var d = new Node("d",rectangles[4]);
+				var e = new Node("e",rectangles[4]);
+				var f = new Node("f",rectangles[3]);
+				var g = new Node("g",rectangles[4]);
+				var h = new Node("h",rectangles[2]);
+				var i = new Node("i",rectangles[3]);
+				var j = new Node("j",rectangles[4]);
+				var k = new Node("k",rectangles[3]);
+				var l = new Node("l",rectangles[0]);
+
+				nodes.push(a);
+				nodes.push(b);
+				nodes.push(c);
+				nodes.push(d);
+				nodes.push(e);
+				nodes.push(f);
+				nodes.push(g);
+				nodes.push(h);
+				nodes.push(i);
+				nodes.push(j);
+				nodes.push(k);
+				nodes.push(l);
+
+				edges.push(new Edge(a,b,10));
+				edges.push(new Edge(a,c,8));
+				edges.push(new Edge(a,d,8));
+				edges.push(new Edge(a,e,9));
+				edges.push(new Edge(a,f,8));
+				edges.push(new Edge(a,g,8));
+				edges.push(new Edge(a,h,8));
+				edges.push(new Edge(a,i,8));
+				edges.push(new Edge(a,j,8));
+				edges.push(new Edge(a,k,24));
+				edges.push(new Edge(a,l,14));
+
+				edges.push(new Edge(b,c,1));
+				edges.push(new Edge(b,l,1));
+				edges.push(new Edge(b,d,1));
+				edges.push(new Edge(b,g,1));
+
+				edges.push(new Edge(d,e,1));
+
+				edges.push(new Edge(e,f,1));
+				edges.push(new Edge(e,g,1));
+
+				edges.push(new Edge(f,g,1));
+				edges.push(new Edge(f,i,2));
+				edges.push(new Edge(f,j,1));
+
+				edges.push(new Edge(g,j,1));
+
+				edges.push(new Edge(j,k,1));
 
 			}
 
@@ -739,6 +800,7 @@
 						
 						var cols = Math.round(Math.sqrt(nodesInRegion(d.region).length));
 
+						console.log(cols, d.label);
 						//console.log((i % cols)+1, i, cols, nodes.length, d.region.width, (d.region.width / (cols + 1)));
 						var cx = ( ((i % cols)+1) * (d.region.width / (cols + 1)) ) + d.region.x;
 						 //var cx = (Math.random() * d.region.width) + d.region.x;
@@ -801,8 +863,12 @@
 					.attr("y2", function(d){
 						return d3.select("#node"+d.target.label).attr("cy");
 					})
-					.style("stroke", "#000000")
-					.style("stroke-width", 1)
+					.style("stroke", function (d){
+						console.log(d.size);
+						var size = Math.max(200-(d.size * 10),0);
+						return "rgb(" + size + "," + size + "," + size + ")";
+					})
+					.style("stroke-width", 2)
 					.attr("id", function(d){
 						return "edge" + d.source.label + d.target.label;
 					});
@@ -843,7 +909,7 @@ nodes[0].y = 100;
 nodes[1].x = 200;
 nodes[1].y = 100;
 */
-
+/*
 				var interval = setInterval(function() {
 							m++;
 							if (m > 500){
@@ -853,7 +919,13 @@ nodes[1].y = 100;
 							iterateGraph(nodes,edges);
 						}
 					,10);
+*/
+			}
 
+			function animate(steps){
+				for (var i = 0; i < steps; i++){
+					next();
+				}
 			}
 
 			function next(){
@@ -1157,8 +1229,14 @@ nodes[1].y = 100;
 
 
 			function main(){
+
+				/* #### ORIGINAL DATASET
 				var zones = "a ab ac bc".split(" ");
 				var input = "a b c ab ac bc abc";
+				*/
+			
+				var zones = "a ab bc bd d".split(" ");
+				var input = "a b c ab ac bc abc d da db dab";
 
 				svg = d3.select("body").append("svg")
 				    .attr("width", 800)
